@@ -1,0 +1,6 @@
+@DiarioBordo.Simple_HostAddress = http://localhost:5130
+
+GET {{DiarioBordo.Simple_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

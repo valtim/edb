@@ -1,0 +1,265 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/valtim/github/diariodebordo/src/DiarioBordo.Infrastructure/DiarioBordo.Infrastructure.csproj": {}
+  },
+  "projects": {
+    "/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/DiarioBordo.Application.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/DiarioBordo.Application.csproj",
+        "projectName": "DiarioBordo.Application",
+        "projectPath": "/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/DiarioBordo.Application.csproj",
+        "packagesPath": "/Users/valtim/.nuget/packages/",
+        "outputPath": "/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/valtim/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/valtim/github/diariodebordo/src/DiarioBordo.Domain/DiarioBordo.Domain.csproj": {
+                "projectPath": "/Users/valtim/github/diariodebordo/src/DiarioBordo.Domain/DiarioBordo.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "AutoMapper": {
+              "target": "Package",
+              "version": "[12.0.1, )"
+            },
+            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+              "target": "Package",
+              "version": "[12.0.1, )"
+            },
+            "FluentValidation": {
+              "target": "Package",
+              "version": "[11.11.0, )"
+            },
+            "FluentValidation.DependencyInjectionExtensions": {
+              "target": "Package",
+              "version": "[11.11.0, )"
+            },
+            "MediatR": {
+              "target": "Package",
+              "version": "[12.4.1, )"
+            },
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.306/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/valtim/github/diariodebordo/src/DiarioBordo.Domain/DiarioBordo.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/valtim/github/diariodebordo/src/DiarioBordo.Domain/DiarioBordo.Domain.csproj",
+        "projectName": "DiarioBordo.Domain",
+        "projectPath": "/Users/valtim/github/diariodebordo/src/DiarioBordo.Domain/DiarioBordo.Domain.csproj",
+        "packagesPath": "/Users/valtim/.nuget/packages/",
+        "outputPath": "/Users/valtim/github/diariodebordo/src/DiarioBordo.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/valtim/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "FluentValidation": {
+              "target": "Package",
+              "version": "[11.11.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.306/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/valtim/github/diariodebordo/src/DiarioBordo.Infrastructure/DiarioBordo.Infrastructure.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/valtim/github/diariodebordo/src/DiarioBordo.Infrastructure/DiarioBordo.Infrastructure.csproj",
+        "projectName": "DiarioBordo.Infrastructure",
+        "projectPath": "/Users/valtim/github/diariodebordo/src/DiarioBordo.Infrastructure/DiarioBordo.Infrastructure.csproj",
+        "packagesPath": "/Users/valtim/.nuget/packages/",
+        "outputPath": "/Users/valtim/github/diariodebordo/src/DiarioBordo.Infrastructure/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/valtim/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/DiarioBordo.Application.csproj": {
+                "projectPath": "/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/DiarioBordo.Application.csproj"
+              },
+              "/Users/valtim/github/diariodebordo/src/DiarioBordo.Domain/DiarioBordo.Domain.csproj": {
+                "projectPath": "/Users/valtim/github/diariodebordo/src/DiarioBordo.Domain/DiarioBordo.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "FluentNHibernate": {
+              "target": "Package",
+              "version": "[3.4.0, )"
+            },
+            "Hangfire.Core": {
+              "target": "Package",
+              "version": "[1.8.17, )"
+            },
+            "Microsoft.Extensions.Configuration.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.DependencyInjection.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[9.1.0, )"
+            },
+            "NHibernate": {
+              "target": "Package",
+              "version": "[5.5.2, )"
+            },
+            "NHibernate.NetCore": {
+              "target": "Package",
+              "version": "[3.1.0, )"
+            },
+            "StackExchange.Redis": {
+              "target": "Package",
+              "version": "[2.8.16, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.306/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

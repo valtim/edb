@@ -1,0 +1,252 @@
+using DiarioBordo.Domain.Entities;
+using DiarioBordo.Domain.Repositories;
+using DiarioBordo.Domain.Enums;
+using NHibernate;
+using NHibernate.Linq;
+
+namespace DiarioBordo.Infrastructure.Repositories;
+
+/// <summary>
+/// Repository para RegistroVoo com consultas otimizadas para conformidade ANAC
+/// </summary>
+public class RegistroVooRepository : Repository<RegistroVoo>, IRegistroVooRepository
+{
+    public RegistroVooRepository(ISession session) : base(session) { }
+
+    /// <summary>
+    /// Consulta crítica: últimos 30 dias (Art. 8º II Res. 457/2017)
+    /// Performance target: <500ms
+    /// </summary>
+    public async Task<IList<RegistroVoo>> GetUltimos30DiasAsync(int aeronaveId)
+    {
+        var dataLimite = DateTime.Today.AddDays(-30);
+
+        // Query otimizada com índice idx_aeronave_data_30dias
+        return await _session.Query<RegistroVoo>()
+            .Where(r => r.AeronaveId == aeronaveId && r.Data >= dataLimite)
+            .OrderByDescending(r => r.Data)
+            .ThenByDescending(r => r.NumeroSequencial)
+            .Fetch(r => r.Aeronave)
+            .Fetch(r => r.PilotoComando)
+            .SetCacheable(true)
+            .SetCacheRegion("RegistrosVoo30Dias")
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Registros pendentes de assinatura do operador (workflow crítico)
+    /// </summary>
+    public async Task<IList<RegistroVoo>> GetPendentesAssinaturaOperadorAsync()
+    {
+        return await _session.Query<RegistroVoo>()
+            .Where(r => r.AssinadoPiloto && !r.AssinadoOperador)
+            .OrderBy(r => r.DataAssinaturaPilotoUTC) // Mais antigos primeiro
+            .Fetch(r => r.Aeronave)
+            .Fetch(r => r.PilotoComando)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Registros pendentes por aeronave
+    /// </summary>
+    public async Task<IList<RegistroVoo>> ObterPendentesAssinaturaPorAeronaveAsync(int aeronaveId)
+    {
+        return await _session.Query<RegistroVoo>()
+            .Where(r => r.AeronaveId == aeronaveId && (!r.AssinadoPiloto || !r.AssinadoOperador))
+            .OrderBy(r => r.Data)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Registros pendentes por piloto
+    /// </summary>
+    public async Task<IList<RegistroVoo>> ObterPendentesAssinaturaPorPilotoAsync(string codigoANAC)
+    {
+        return await _session.Query<RegistroVoo>()
+            .Where(r => r.PilotoComandoCodigo.Valor == codigoANAC && !r.AssinadoPiloto)
+            .OrderBy(r => r.Data)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Registros por piloto em comando em período
+    /// </summary>
+    public async Task<IList<RegistroVoo>> ObterPorPilotoComandoAsync(string codigoANAC, DateTime dataInicio, DateTime dataFim)
+    {
+        return await _session.Query<RegistroVoo>()
+            .Where(r => r.PilotoComandoCodigo == codigoANAC && r.Data >= dataInicio && r.Data <= dataFim)
+            .OrderByDescending(r => r.Data)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Registros pendentes de assinatura com prazo
+    /// </summary>
+    public async Task<IList<RegistroVoo>> ObterPendentesAssinaturaOperadorComPrazoAsync(int operadorId, DateTime dataLimite)
+    {
+        return await _session.Query<RegistroVoo>()
+            .Where(r => r.Aeronave != null &&
+                       r.AssinadoPiloto &&
+                       !r.AssinadoOperador &&
+                       r.Data >= dataLimite)
+            .OrderBy(r => r.Data)
+            .Fetch(r => r.Aeronave)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Registros pendentes de assinatura geral
+    /// </summary>
+    public async Task<IList<RegistroVoo>> ObterRegistrosPendentesAssinaturaAsync(DateTime dataLimite)
+    {
+        return await _session.Query<RegistroVoo>()
+            .Where(r => r.Data >= dataLimite && (!r.AssinadoPiloto || !r.AssinadoOperador))
+            .OrderBy(r => r.Data)
+            .Fetch(r => r.Aeronave)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Registros pendentes de sincronização com ANAC
+    /// </summary>
+    public async Task<IList<RegistroVoo>> GetPendentesSincronizacaoAsync()
+    {
+        return await _session.Query<RegistroVoo>()
+            .Where(r => r.AssinadoPiloto && r.AssinadoOperador && !r.SincronizadoANAC)
+            .OrderBy(r => r.DataAssinaturaOperadorUTC)
+            .Fetch(r => r.Aeronave)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Registros com prazo de assinatura próximo ao vencimento
+    /// </summary>
+    public async Task<IList<RegistroVoo>> GetComPrazoProximoVencimentoAsync(int diasAviso = 2)
+    {
+        var agora = DateTime.UtcNow;
+
+        var result = await _session.Query<RegistroVoo>()
+            .Fetch(r => r.Aeronave)
+            .Where(r => r.AssinadoPiloto &&
+                       !r.AssinadoOperador &&
+                       r.DataAssinaturaPilotoUTC != null)
+            .ToListAsync();
+
+        // Filtrar em memória após consulta ao banco
+        return result
+            .Where(r =>
+            {
+                var prazoVencimento = r.DataAssinaturaPilotoUTC!.Value
+                    .AddDays(r.Aeronave.PrazoAssinaturaOperadorDias());
+                var diasRestantes = (prazoVencimento - agora).TotalDays;
+                return diasRestantes <= diasAviso && diasRestantes > 0;
+            })
+            .ToList();
+    }
+
+    /// <summary>
+    /// Registros com prazo vencido por tipo RBAC
+    /// </summary>
+    public async Task<IList<RegistroVoo>> GetComPrazoVencidoAsync()
+    {
+        var agora = DateTime.UtcNow;
+
+        var result = await _session.Query<RegistroVoo>()
+            .Fetch(r => r.Aeronave)
+            .Where(r => r.AssinadoPiloto &&
+                       !r.AssinadoOperador &&
+                       r.DataAssinaturaPilotoUTC != null)
+            .ToListAsync();
+
+        return result
+            .Where(r =>
+            {
+                var prazoVencimento = r.DataAssinaturaPilotoUTC!.Value
+                    .AddDays(r.Aeronave.PrazoAssinaturaOperadorDias());
+                return agora > prazoVencimento;
+            })
+            .OrderBy(r => r.DataAssinaturaPilotoUTC)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Busca por período com filtros opcionais
+    /// </summary>
+    public async Task<IList<RegistroVoo>> BuscarPorPeriodoAsync(
+        DateTime dataInicio,
+        DateTime dataFim,
+        int? aeronaveId = null,
+        string? codigoPiloto = null)
+    {
+        var query = _session.Query<RegistroVoo>()
+            .Where(r => r.Data >= dataInicio && r.Data <= dataFim);
+
+        if (aeronaveId.HasValue)
+        {
+            query = query.Where(r => r.AeronaveId == aeronaveId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(codigoPiloto))
+        {
+            query = query.Where(r => r.PilotoComando.CodigoANAC == codigoPiloto);
+        }
+
+        return await query
+            .OrderByDescending(r => r.Data)
+            .ThenByDescending(r => r.NumeroSequencial)
+            .Fetch(r => r.Aeronave)
+            .Fetch(r => r.PilotoComando)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Obtém próximo número sequencial para uma aeronave
+    /// </summary>
+    public async Task<long> GetProximoNumeroSequencialAsync(int aeronaveId)
+    {
+        // Usa HQL para performance otimizada
+        var maxSequencial = await _session.CreateQuery(
+            "SELECT COALESCE(MAX(r.NumeroSequencial), 0) FROM RegistroVoo r WHERE r.AeronaveId = :aeronaveId")
+            .SetParameter("aeronaveId", aeronaveId)
+            .SetCacheable(true)
+            .UniqueResultAsync<long>();
+
+        return maxSequencial + 1;
+    }
+
+    /// <summary>
+    /// Busca registros por hash (para verificação de integridade)
+    /// </summary>
+    public async Task<RegistroVoo?> GetByHashAsync(string hash)
+    {
+        return await _session.Query<RegistroVoo>()
+            .Where(r => r.HashRegistro == hash)
+            .FirstOrDefaultAsync();
+    }
+
+    /// <summary>
+    /// Obtém estatísticas de registros por aeronave
+    /// </summary>
+    public async Task<object> GetEstatisticasPorAeronaveAsync(int aeronaveId, DateTime? dataInicio = null)
+    {
+        var query = _session.Query<RegistroVoo>()
+            .Where(r => r.AeronaveId == aeronaveId);
+
+        if (dataInicio.HasValue)
+        {
+            query = query.Where(r => r.Data >= dataInicio.Value);
+        }
+
+        var registros = await query.ToListAsync();
+
+        return new
+        {
+            TotalRegistros = registros.Count,
+            RegistrosAssinados = registros.Count(r => r.AssinadoPiloto && r.AssinadoOperador),
+            RegistrosPendentes = registros.Count(r => r.AssinadoPiloto && !r.AssinadoOperador),
+            RegistrosSincronizados = registros.Count(r => r.SincronizadoANAC),
+            TotalHorasVoadas = registros.Sum(r => r.CalcularTempoVooTotal()),
+            UltimoVoo = registros.OrderByDescending(r => r.Data).FirstOrDefault()?.Data
+        };
+    }
+}

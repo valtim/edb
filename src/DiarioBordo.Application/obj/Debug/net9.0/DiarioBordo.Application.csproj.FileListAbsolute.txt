@@ -1,0 +1,16 @@
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/obj/Debug/net9.0/DiarioBordo.Application.csproj.AssemblyReference.cache
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/obj/Debug/net9.0/DiarioBordo.Application.GeneratedMSBuildEditorConfig.editorconfig
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/obj/Debug/net9.0/DiarioBordo.Application.AssemblyInfoInputs.cache
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/obj/Debug/net9.0/DiarioBordo.Application.AssemblyInfo.cs
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/obj/Debug/net9.0/DiarioBordo.Application.csproj.CoreCompileInputs.cache
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/bin/Debug/net9.0/DiarioBordo.Application.deps.json
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/bin/Debug/net9.0/DiarioBordo.Application.dll
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/bin/Debug/net9.0/DiarioBordo.Application.pdb
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/bin/Debug/net9.0/DiarioBordo.Domain.dll
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/bin/Debug/net9.0/DiarioBordo.Domain.pdb
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/obj/Debug/net9.0/DiarioBo.A37488E7.Up2Date
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/obj/Debug/net9.0/DiarioBordo.Application.dll
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/obj/Debug/net9.0/refint/DiarioBordo.Application.dll
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/obj/Debug/net9.0/DiarioBordo.Application.pdb
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/obj/Debug/net9.0/ref/DiarioBordo.Application.dll
+/Users/valtim/github/diariodebordo/src/DiarioBordo.Application/obj/Debug/net9.0/DiarioBordo.Application.sourcelink.json
