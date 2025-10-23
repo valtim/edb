@@ -1,0 +1,10 @@
+/Users/valtim/github/diariodebordo/tests/DiarioBordo.API.Tests/obj/Debug/net9.0/DiarioBordo.API.Tests.csproj.AssemblyReference.cache
+/Users/valtim/github/diariodebordo/tests/DiarioBordo.API.Tests/obj/Debug/net9.0/rpswa.dswa.cache.json
+/Users/valtim/github/diariodebordo/tests/DiarioBordo.API.Tests/obj/Debug/net9.0/MvcTestingAppManifest.json
+/Users/valtim/github/diariodebordo/tests/DiarioBordo.API.Tests/obj/Debug/net9.0/DiarioBordo.API.Tests.GeneratedMSBuildEditorConfig.editorconfig
+/Users/valtim/github/diariodebordo/tests/DiarioBordo.API.Tests/obj/Debug/net9.0/DiarioBordo.API.Tests.AssemblyInfoInputs.cache
+/Users/valtim/github/diariodebordo/tests/DiarioBordo.API.Tests/obj/Debug/net9.0/DiarioBordo.API.Tests.AssemblyInfo.cs
+/Users/valtim/github/diariodebordo/tests/DiarioBordo.API.Tests/obj/Debug/net9.0/DiarioBordo.API.Tests.csproj.CoreCompileInputs.cache
+/Users/valtim/github/diariodebordo/tests/DiarioBordo.API.Tests/obj/Debug/net9.0/DiarioBordo.API.Tests.MvcApplicationPartsAssemblyInfo.cs
+/Users/valtim/github/diariodebordo/tests/DiarioBordo.API.Tests/obj/Debug/net9.0/DiarioBordo.API.Tests.MvcApplicationPartsAssemblyInfo.cache
+/Users/valtim/github/diariodebordo/tests/DiarioBordo.API.Tests/obj/Debug/net9.0/DiarioBordo.API.Tests.sourcelink.json

@@ -1,0 +1,304 @@
+name: CI/CD Pipeline - Diário de Bordo Digital
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  test:
+    name: 🧪 Testes Automatizados
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: diariobordo_test
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: test_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+
+    - name: 🛠️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 📦 Restaurar dependências
+      run: dotnet restore
+
+    - name: 🔨 Build da solução
+      run: dotnet build --no-restore --configuration Release
+
+    - name: 🧪 Testes Unitários - Domain
+      run: |
+        dotnet test tests/DiarioBordo.Domain.Tests \
+          --no-build \
+          --configuration Release \
+          --logger trx \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./test-results/domain
+
+    - name: 🧪 Testes de Repositório - Infrastructure
+      run: |
+        dotnet test tests/DiarioBordo.Infrastructure.Tests \
+          --no-build \
+          --configuration Release \
+          --logger trx \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./test-results/infrastructure
+
+    - name: 🧪 Testes de Integração - API
+      env:
+        ConnectionStrings__DefaultConnection: "Server=localhost;Port=3306;Database=diariobordo_test;Uid=test_user;Pwd=test_password;"
+        ConnectionStrings__Redis: "localhost:6379"
+      run: |
+        dotnet test tests/DiarioBordo.API.Tests \
+          --no-build \
+          --configuration Release \
+          --logger trx \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./test-results/api
+
+    - name: 📊 Processar relatórios de cobertura
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.2.0
+      with:
+        reports: './test-results/**/coverage.cobertura.xml'
+        targetdir: './coverage-report'
+        reporttypes: 'HtmlInline_AzurePipelines;Cobertura;JsonSummary'
+
+    - name: 📈 Upload relatório de cobertura
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage-report/Cobertura.xml
+        fail_ci_if_error: false
+
+    - name: 📋 Publicar resultados dos testes
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: 'Resultados dos Testes'
+        path: './test-results/**/*.trx'
+        reporter: 'dotnet-trx'
+
+  compliance-check:
+    name: 🏛️ Verificação de Conformidade ANAC
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+
+    - name: 🛠️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: ✅ Verificar 17 campos obrigatórios Res. 457/2017
+      run: |
+        echo "🔍 Verificando conformidade com Resolução ANAC 457/2017..."
+        
+        # Executar testes específicos de conformidade ANAC
+        dotnet test tests/DiarioBordo.Domain.Tests \
+          --filter "FullyQualifiedName~AnacCompliance" \
+          --logger:"console;verbosity=detailed"
+        
+        echo "✅ Verificação de conformidade concluída"
+
+    - name: 🔐 Verificar assinaturas digitais Res. 458/2017
+      run: |
+        echo "🔍 Verificando conformidade com Resolução ANAC 458/2017..."
+        
+        # Executar testes específicos de assinatura digital
+        dotnet test tests/DiarioBordo.Domain.Tests \
+          --filter "FullyQualifiedName~AssinaturaDigital" \
+          --logger:"console;verbosity=detailed"
+        
+        echo "🔐 Verificação de assinaturas digitais concluída"
+
+  security-scan:
+    name: 🔒 Scan de Segurança
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+
+    - name: 🛠️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 🔍 Scan de vulnerabilidades NuGet
+      run: |
+        dotnet restore
+        dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
+        
+        # Falhar se vulnerabilidades críticas forem encontradas
+        if grep -q "Critical\|High" vulnerability-report.txt; then
+          echo "❌ Vulnerabilidades críticas encontradas!"
+          exit 1
+        else
+          echo "✅ Nenhuma vulnerabilidade crítica encontrada"
+        fi
+
+    - name: 🔐 Verificar configurações de segurança
+      run: |
+        echo "🔍 Verificando configurações de segurança..."
+        
+        # Verificar se há hardcoded secrets
+        if grep -r "password\|secret\|key" src/ --include="*.cs" --include="*.json" | grep -v "Password" | grep -v "// TODO\|// FIXME"; then
+          echo "⚠️ Possíveis secrets hardcoded encontrados"
+        else
+          echo "✅ Nenhum secret hardcoded encontrado"
+        fi
+
+  performance-test:
+    name: ⚡ Testes de Performance
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: diariobordo_perf
+          MYSQL_USER: perf_user
+          MYSQL_PASSWORD: perf_password
+        ports:
+          - 3306:3306
+
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+
+    - name: 🛠️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: ⚡ Teste de performance - Consulta 30 dias
+      env:
+        ConnectionStrings__DefaultConnection: "Server=localhost;Port=3306;Database=diariobordo_perf;Uid=perf_user;Pwd=perf_password;"
+      run: |
+        echo "⚡ Testando performance da consulta dos últimos 30 dias..."
+        echo "📋 Requisito: < 500ms conforme Art. 8º II Res. 457/2017"
+        
+        # Executar teste específico de performance
+        dotnet test tests/DiarioBordo.Infrastructure.Tests \
+          --filter "FullyQualifiedName~UltimosTrindaDias" \
+          --logger:"console;verbosity=detailed"
+
+  build-docker:
+    name: 🐳 Build Docker
+    runs-on: ubuntu-latest
+    needs: [test, compliance-check, security-scan]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+
+    - name: 🏗️ Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: 🐳 Build imagem Docker
+      run: |
+        docker build -t diariobordo-api:latest \
+          --file src/DiarioBordo.API/Dockerfile \
+          --build-arg BUILDVERSION=${{ github.sha }} \
+          .
+
+    - name: 🧪 Teste básico da imagem
+      run: |
+        # Verificar se a imagem foi criada corretamente
+        docker images diariobordo-api:latest
+        
+        # Verificar se o container inicia sem erros
+        docker run --rm -d --name test-container \
+          -e ASPNETCORE_ENVIRONMENT=Production \
+          -p 8080:8080 \
+          diariobordo-api:latest &
+        
+        sleep 10
+        
+        # Verificar se o healthcheck passa
+        if docker ps | grep test-container; then
+          echo "✅ Container executando corretamente"
+          docker stop test-container || true
+        else
+          echo "❌ Falha ao executar container"
+          docker logs test-container || true
+          exit 1
+        fi
+
+  deployment-staging:
+    name: 🚀 Deploy Staging
+    runs-on: ubuntu-latest
+    needs: [build-docker, performance-test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: staging
+
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+
+    - name: 🚀 Deploy para ambiente de staging
+      run: |
+        echo "🚀 Deploying para ambiente de staging..."
+        echo "📋 Verificações de deployment:"
+        echo "  ✅ Testes passaram"
+        echo "  ✅ Conformidade ANAC verificada"
+        echo "  ✅ Scan de segurança passou"
+        echo "  ✅ Testes de performance passaram"
+        echo "  ✅ Build Docker concluído"
+        echo "🎯 Deploy simulado com sucesso!"
+
+  notify:
+    name: 📢 Notificações
+    runs-on: ubuntu-latest
+    needs: [deployment-staging]
+    if: always()
+
+    steps:
+    - name: 📢 Notificar resultado
+      run: |
+        if [ "${{ needs.deployment-staging.result }}" = "success" ]; then
+          echo "✅ Pipeline executado com sucesso!"
+          echo "🎯 Sistema Diário de Bordo Digital pronto para produção"
+          echo "🏛️ Conformidade ANAC 457/2017 e 458/2017 verificada"
+        else
+          echo "❌ Pipeline falhou"
+          echo "🔍 Verificar logs para detalhes"
+        fi

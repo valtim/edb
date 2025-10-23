@@ -1,0 +1,19 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Instalar Angular CLI globalmente
+RUN npm install -g @angular/cli@18
+
+# Copiar arquivos de dependência
+COPY package*.json ./
+RUN npm install
+
+# Copiar código fonte
+COPY . .
+
+# Expor porta do dev server
+EXPOSE 4200
+
+# Comando para desenvolvimento com hot reload
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200", "--poll", "2000"]

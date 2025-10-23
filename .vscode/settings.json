@@ -1,0 +1,39 @@
+{
+    "typescript.preferences.renameMatchingJsxTags": false,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "typescript.suggest.autoImports": true,
+    "typescript.preferences.includePackageJsonAutoImports": "auto",
+    "angular.enable-strict-mode-prompt": false,
+    "typescript.referencesCodeLens.enabled": true,
+    "typescript.referencesCodeLens.showOnAllFunctions": true,
+    "files.associations": {
+        "*.component.html": "html",
+        "*.component.ts": "typescript"
+    },
+    "emmet.includeLanguages": {
+        "typescript": "html"
+    },
+    "workbench.editor.enablePreview": false,
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    "typescript.disableAutomaticTypeAcquisition": false,
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "typescript.suggest.completeFunctionCalls": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
+        "source.fixAll.eslint": "explicit"
+    },
+    "editor.formatOnSave": true,
+    "[typescript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "[scss]": {
+        "editor.defaultFormatter": "vscode.css-language-features"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    }
+}

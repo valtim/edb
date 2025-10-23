@@ -1,0 +1,27 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0
+
+WORKDIR /app
+
+# Instalar ferramentas de desenvolvimento
+RUN dotnet tool install --global dotnet-ef
+RUN dotnet tool install --global dotnet-watch
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+# Copiar arquivos de projeto
+COPY ["src/DiarioBordo.API/DiarioBordo.API.csproj", "DiarioBordo.API/"]
+COPY ["src/DiarioBordo.Application/DiarioBordo.Application.csproj", "DiarioBordo.Application/"]
+COPY ["src/DiarioBordo.Domain/DiarioBordo.Domain.csproj", "DiarioBordo.Domain/"]
+COPY ["src/DiarioBordo.Infrastructure/DiarioBordo.Infrastructure.csproj", "DiarioBordo.Infrastructure/"]
+
+# Restaurar dependências
+RUN dotnet restore "DiarioBordo.API/DiarioBordo.API.csproj"
+
+# Copiar código fonte
+COPY src/ .
+
+# Expor porta
+EXPOSE 8080
+
+# Comando para desenvolvimento com hot reload
+WORKDIR "/app/DiarioBordo.API"
+CMD ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:8080"]

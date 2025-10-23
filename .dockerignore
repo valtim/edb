@@ -1,0 +1,83 @@
+# Build outputs
+**/bin/
+**/obj/
+**/dist/
+**/node_modules/
+**/target/
+**/build/
+
+# Source control
+.git/
+.gitignore
+.gitattributes
+**/.gitignore
+**/.gitattributes
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+**/*.log
+logs/
+
+# Runtime
+**/.env
+**/.env.local
+**/.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test
+**/TestResults/
+**/*.trx
+**/*.coverage
+**/coverage/
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+*.temp
+
+# Package files
+*.nupkg
+*.snupkg
+*.tgz
+*.tar.gz
+
+# Certificates
+*.pfx
+*.p12
+*.key
+*.pem
+*.crt
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache
+.cache/
+**/.cache/
+**/.parcel-cache/

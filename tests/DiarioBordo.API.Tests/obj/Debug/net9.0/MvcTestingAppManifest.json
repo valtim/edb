@@ -1,0 +1,6 @@
+{
+  "DiarioBordo.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/valtim\/github\/diariodebordo\/src\/DiarioBordo.API",
+  "DiarioBordo.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/valtim\/github\/diariodebordo\/src\/DiarioBordo.Application",
+  "DiarioBordo.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/valtim\/github\/diariodebordo\/src\/DiarioBordo.Domain",
+  "DiarioBordo.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/valtim\/github\/diariodebordo\/src\/DiarioBordo.Infrastructure"
+}

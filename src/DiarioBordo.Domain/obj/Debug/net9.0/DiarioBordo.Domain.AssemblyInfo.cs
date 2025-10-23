@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DiarioBordo.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+26f248532860f541720262464d36457cf79a4be9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7d5533908f0b2f19bca26f2ff391baa537cfdba2")]
 [assembly: System.Reflection.AssemblyProductAttribute("DiarioBordo.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DiarioBordo.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

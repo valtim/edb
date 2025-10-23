@@ -1,0 +1,65 @@
+version: '3.8'
+
+# Override para desenvolvimento
+# Use: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  # Frontend com hot reload
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: diario-bordo-frontend-dev
+    restart: unless-stopped
+    volumes:
+      - ./frontend/src:/app/src:ro
+      - ./frontend/angular.json:/app/angular.json:ro
+      - ./frontend/package.json:/app/package.json:ro
+      - ./frontend/tsconfig.json:/app/tsconfig.json:ro
+    ports:
+      - "4200:4200"
+    networks:
+      - diario-bordo-network
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    command: npm start
+
+  # API com hot reload
+  api:
+    build:
+      context: .
+      dockerfile: src/DiarioBordo.API/Dockerfile.dev
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=diario_bordo;User=diario_user;Password=DiarioUser2024!;Port=3306;SslMode=None;AllowPublicKeyRetrieval=true;
+      - ConnectionStrings__Redis=redis:6379
+      - JWT__SecretKey=DiarioBordoSecretKey2024VeryLongAndSecureKey123!
+      - Logging__LogLevel__Default=Debug
+      - Logging__LogLevel__Microsoft.AspNetCore=Information
+    volumes:
+      - ./src:/app/src:ro
+      - ./tests:/app/tests:ro
+    
+  # MySQL com configurações de desenvolvimento
+  mysql:
+    environment:
+      MYSQL_ROOT_PASSWORD: DiarioBordo2024!
+      MYSQL_DATABASE: diario_bordo_dev
+      MYSQL_USER: diario_user
+      MYSQL_PASSWORD: DiarioUser2024!
+    ports:
+      - "3307:3306" # Porta diferente para não conflitar
+
+  # Redis com configurações de desenvolvimento
+  redis:
+    ports:
+      - "6380:6379" # Porta diferente para não conflitar
+
+  # Nginx simplificado para dev
+  nginx:
+    volumes:
+      - ./docker/nginx/nginx-dev.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
